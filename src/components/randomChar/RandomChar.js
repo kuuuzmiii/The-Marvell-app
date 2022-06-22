@@ -1,14 +1,13 @@
 import {useState,useEffect} from 'react';
 import MarvelServices from '../../services/Service';
-import Spinner from '../../spinner/Spinner';
-import ErrorMessage from '../errorMessage/ErrorMessage';
+import setState from '../../utils/setState';
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
 const RandomChar = () => {
 
-    const{loading,error,clearError,getCharters} = MarvelServices();
+    const{clearError,getCharters,process,setProcess} = MarvelServices();
 
     const [char,setChar] = useState({});
 
@@ -31,17 +30,14 @@ const RandomChar = () => {
     const updateChar = () => {
         clearError();
         const id = Math.round(Math.random() * (1011400 - 1011000) + 1011000);
-        getCharters(id).then(onUpdateState);
+        getCharters(id)
+            .then(onUpdateState)
+            .then(()=> setProcess('confirm'));
     }
-     
-    const errorMessge = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const chars = !(errorMessge || spinner) ? <View char={char}/> : null;
+
     return (
         <div className="randomchar">
-            {errorMessge}
-            {spinner}
-            {chars}
+            {setState(process,View,char)}
             <div className="randomchar__static">
                 <p className="randomchar__title">
                     Random character for today!<br/>
@@ -59,11 +55,11 @@ const RandomChar = () => {
     )
 }
 
-export const View = ({char}) => {
-    const {name,description,thubnaill,homepage,wiki,styleImg} = char
+export const View = ({data}) => {
+    const {name,description,thumbnail,homepage,wiki,styleImg} = data;
     return (
         <div className="randomchar__block">
-            <img src={thubnaill} alt="Random character" className="randomchar__img" 
+            <img src={thumbnail} alt="Random character" className="randomchar__img" 
                  style={{objectFit:styleImg}}/>
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>

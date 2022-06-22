@@ -7,12 +7,11 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 import MarvelServices from '../../services/Service';
 
 import './charSearchList.scss';
-import { string } from 'prop-types';
 
 const CharSearchList = () => {
     const [nameChar,setNameChar] = useState(null);
 
-    const {loading, error, clearError, getCharterName} = MarvelServices();
+    const {clearError, getCharterName,process,setProcess} = MarvelServices();
 
     const onChar = (charcter) => {
         setNameChar(charcter);
@@ -22,18 +21,16 @@ const CharSearchList = () => {
         clearError();
 
         getCharterName(name)
-                    .then(res => {
-                        onChar(res);
-                        console.log(nameChar)
-                    });
+                    .then(onChar)
+                    .then(()=> setProcess('confirm'));
     }
     
-    const errors = error ? <div className='char__search-critical-error'><ErrorMessage/></div> : null;
+    const errors = process === 'error' ? <div className='char__search-critical-error'><ErrorMessage/></div> : null;
     const result = !nameChar ? null : nameChar.length > 0 ?
                            <div className="char__search-wrapper">
                                 <div className='char__search-success'>This character has been found</div>
-                                <Link to={`/comics/${nameChar[0].id}`}>
-                                    <button className="button button__main" onClick={console.log(nameChar[0])}><div className="inner">Sign up</div></button>
+                                <Link to={`/character/${nameChar[0].id}`}>
+                                    <button className="button button__main"><div className="inner">Sign up</div></button>
                                 </Link>
                            </div> : 
                            <div className='char__search-error'>There is no such character</div> 
@@ -59,8 +56,7 @@ const CharSearchList = () => {
                         <Field  name="name" type="text" />
                         <button
                             type="submit"
-                            className="button button__main"
-                            disabled={loading} >
+                            className="button button__main" >
                             <div className="inner">find</div>
                         </button>
                     </div>

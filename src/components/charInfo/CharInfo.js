@@ -2,9 +2,7 @@ import {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 import MarvelServices from '../../services/Service';
-import ErrorMessage from '../errorMessage/ErrorMessage';
-import Spinner from '../../spinner/Spinner';
-import Skeleton from '../skeleton/Skeleton'
+import setState from '../../utils/setState';
 
 import './charInfo.scss';
 
@@ -12,7 +10,7 @@ const CharInfo = (props) => {
 
     const [char,setChar] = useState(null);
 
-    const {loading,error,clearError,getCharters} = MarvelServices();
+    const {clearError,getCharters,process,setProcess} = MarvelServices();
 
     useEffect(()=>{
         onUpdateChar();
@@ -27,31 +25,23 @@ const CharInfo = (props) => {
         }
 
         getCharters(charId)
-                      .then(onCharLoaded);
+                      .then(onCharLoaded)
+                      .then(() => setProcess('confirm'));
     }
 
     const onCharLoaded =(char) =>{
         clearError();
         setChar(char);
     }
-
-    const skeleton = char || loading || error ?  null : <Skeleton/>;
-    const errorMessge = error ? <ErrorMessage/> : null;
-    const spinner = loading ? <Spinner/> : null;
-    const content = !(loading || error || !char) ? <View char={char}/> : null; 
-
     return (
         <div className="char__info">
-            {skeleton}
-            {errorMessge}
-            {spinner}
-            {content}
+            {setState(process,View,char)}
         </div>
     )
 }
 
-const View = ({char}) => {
-    const {name,description,thubnaill,homepage,wiki,styleImg,comics} = char;
+const View = ({data}) => {
+    const {name,description,thumbnail,homepage,wiki,styleImg,comics} = data;
 
     const onComics = comics.map((item,i) => {
                 return(
@@ -72,7 +62,7 @@ const View = ({char}) => {
     return (
         <>
             <div className="char__basics">
-                <img src={thubnaill} alt={name} style={{objectFit:styleImg}}/>
+                <img src={thumbnail} alt={name} style={{objectFit:styleImg}}/>
                 <div>
                     <div className="char__info-name">{name}</div>
                     <div className="char__btns">

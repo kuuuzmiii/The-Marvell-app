@@ -2,7 +2,7 @@ import {useHttp} from '../hooks/http.hooks';
 
 const MarvelServices = () => {
 
-    const {loading, request, error, clearError} = useHttp();
+    const {request,clearError, process, setProcess} = useHttp();
 
     const _apiBase = 'https://gateway.marvel.com:443/v1/public/';
     const _apiKey = 'apikey=d6319692c75d314b95b50d422061fedf';
@@ -34,7 +34,7 @@ const MarvelServices = () => {
             id:res.id,
             name:res.name,
             description:res.description ? `${res.description.slice(0,210)}...` : 'There is no description for this character.',
-            thubnaill:`${res.thumbnail.path}.${res.thumbnail.extension}`,
+            thumbnail:`${res.thumbnail.path}.${res.thumbnail.extension}`,
             homepage:res.urls[1].url,
             wiki:res.urls[1].url,
             styleImg: res.thumbnail.path = defauldImg ? 'contain' : 'cover',
@@ -55,9 +55,9 @@ const MarvelServices = () => {
     }
 
     return {
-        loading,
-        error,
         clearError,
+        process,
+        setProcess,
         getAllCharters,
         getCharters,
         getAllComics,

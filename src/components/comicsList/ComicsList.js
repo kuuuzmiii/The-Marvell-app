@@ -7,9 +7,28 @@ import ErrorMessage from '../errorMessage/ErrorMessage';
 
 import './comicsList.scss';
 
+const setState = (process,Component,loadedComics) => {
+    switch (process) {
+        case 'waiting':
+            return <Spinner/>
+            break;
+        case 'loading':
+            return !!loadedComics ? <Component/> : <Spinner/>
+            break;
+        case 'error':
+            return <ErrorMessage/>
+            break;
+        case 'confirm':
+            return <Component/>
+        default:
+
+            break;
+    }
+}
+
 const ComicsList = () => {
 
-    const {loading, error, getAllComics } = MarvelServices();
+    const {getAllComics,process,setProcess } = MarvelServices();
 
     const [comicsList,setComicsList] = useState([]);
     const [loadedComics,setLoadedComics] = useState(false);
@@ -23,7 +42,8 @@ const ComicsList = () => {
     const onRequestComics = (offset,initial) => {
         initial ? setLoadedComics(false) : setLoadedComics(true);
         getAllComics(offset)
-            .then(onComicsListLoaded);
+            .then(onComicsListLoaded)
+            .then(() => setProcess('confirm'))
     }
 
     const onComicsListLoaded = (newComicsList) => {
@@ -60,16 +80,9 @@ const ComicsList = () => {
         )
     };
 
-    const items = renderItems(comicsList);
-
-    const spinner = loading && !loadedComics ? <Spinner/> : null;
-    const errors = error ? <ErrorMessage/> : null;
-
     return (
         <div className="comics__list">
-            {spinner}
-            {errors}
-            {items}
+        {setState(process,() => renderItems(comicsList),loadedComics)}
             <button 
                 className="button button__main button__long"
                 disabled={loadedComics}
